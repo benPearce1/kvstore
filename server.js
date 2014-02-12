@@ -1,10 +1,7 @@
 var http = require('http');
 var url = require('url');
 var fs = require('fs');
-<<<<<<< HEAD
 var port = process.env.port || 80
-=======
->>>>>>> origin/azure
 
 function createNewData(id)
 {
@@ -24,14 +21,6 @@ function write(id, data)
 	fs.writeFile(getFileName(id), JSON.stringify(data,null,4));
 }
 
-<<<<<<< HEAD
-function read(id)
-{
-	
-}
-
-=======
->>>>>>> origin/azure
 http.createServer(function (req, res) {
   res.writeHead(200, {'Content-Type': 'text/plain'});
   var url_parts = url.parse(req.url, true);
@@ -113,10 +102,5 @@ http.createServer(function (req, res) {
 	});
 	
   }
-<<<<<<< HEAD
 }).listen(port, '127.0.0.1');
 console.log('Server running at http://127.0.0.1:' + port + '/');
-=======
-}).listen(1337, '127.0.0.1');
-console.log('Server running at http://127.0.0.1:1337/');
->>>>>>> origin/azure
