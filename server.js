@@ -18,14 +18,9 @@ function createNewData(id)
 	return d;
 }
 
-function getFileName(id)
-{
-	return 'data/' + id + '.json';
-}
-
 function write(id, data)
 {
-	blobService.createBlockBlobFromTest('data',id,JSON.stringify(data,null,4), 
+	blobService.createBlockBlobFromTest(process.env.StorageContainerName, id, JSON.stringify(data,null,4), 
 		function(error) {
 			if(!error)
 			{
@@ -79,14 +74,14 @@ http.createServer(function (req, res) {
   
   if (action == 'get')
   {
-	fs.readFile(getFileName(apikey), function(err, data) {
+	blobService.getBlobToText(process.env.StorageContainerName, apikey, function(error, data, blockBlob, response) {
 		if (err)
 		{
 			console.log(err);
 			return;
 		}
-		data = JSON.parse(data);
-	
+		data = json.parse(data);
+		
 		if (data.dict[name] != null)
 		{
 			res.writeHead(200);
@@ -96,25 +91,40 @@ http.createServer(function (req, res) {
 		{
 			res.writeHead(200);
 			res.end();
-		}});
+		}
+	});
   } 
   else if (action == 'set')
   {
-	
-	fs.readFile(getFileName(apikey), function(err, data) {
+	blobService.getBlobToText(process.env.StorageContainerName, apikey, function(error, data, blockBlob, response) {
 		if (err)
 		{
 			console.log(err);
 			return;
 		}
+		data = json.parse(data);
 		
-		data = JSON.parse(data);
-		//console.log(data);
 		data.dict[name] = a[3];
 		write(apikey,data);
 		res.writeHead(200);
 		res.end(a[3]);
 	});
+	
+	
+	// fs.readFile(getFileName(apikey), function(err, data) {
+		// if (err)
+		// {
+			// console.log(err);
+			// return;
+		// }
+		
+		// data = JSON.parse(data);
+		// //console.log(data);
+		// data.dict[name] = a[3];
+		// write(apikey,data);
+		// res.writeHead(200);
+		// res.end(a[3]);
+	// });
 	
   }
 }).listen(port, '127.0.0.1');
