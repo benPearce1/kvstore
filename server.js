@@ -74,7 +74,7 @@ http.createServer(function (req, res) {
   if (action == 'get')
   {
 	blobService.getBlobToText(process.env.StorageContainerName, apikey, function(error, data, blockBlob, response) {
-		if (err)
+		if (error)
 		{
 			console.log(err);
 			return;
@@ -96,7 +96,7 @@ http.createServer(function (req, res) {
   else if (action == 'set')
   {
 	blobService.getBlobToText(process.env.StorageContainerName, apikey, function(error, data, blockBlob, response) {
-		if (err)
+		if (error)
 		{
 			console.log(err);
 			return;
