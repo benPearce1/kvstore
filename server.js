@@ -79,7 +79,7 @@ http.createServer(function (req, res) {
 			console.log(err);
 			return;
 		}
-		data = json.parse(data);
+		data = JSON.parse(data);
 		
 		if (data.dict[name] != null)
 		{
@@ -108,23 +108,6 @@ http.createServer(function (req, res) {
 		res.writeHead(200);
 		res.end(a[3]);
 	});
-	
-	
-	// fs.readFile(getFileName(apikey), function(err, data) {
-		// if (err)
-		// {
-			// console.log(err);
-			// return;
-		// }
-		
-		// data = JSON.parse(data);
-		// //console.log(data);
-		// data.dict[name] = a[3];
-		// write(apikey,data);
-		// res.writeHead(200);
-		// res.end(a[3]);
-	// });
-	
   }
 }).listen(port, '127.0.0.1');
 console.log('Server running at http://127.0.0.1:' + port + '/');
