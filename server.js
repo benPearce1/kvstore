@@ -1,7 +1,14 @@
 var http = require('http');
+var port = process.env.port || 80
 var url = require('url');
 var fs = require('fs');
-var port = process.env.port || 80
+var azure = require('azure');
+var blobService = azure.createBlobService();
+blobService.createContainerIfNotExists('data', function(error){
+    if(!error){
+        // Container exists and is private
+    }
+});
 
 function createNewData(id)
 {
@@ -18,7 +25,14 @@ function getFileName(id)
 
 function write(id, data)
 {
-	fs.writeFile(getFileName(id), JSON.stringify(data,null,4));
+	blobService.createBlockBlobFromTest('data',id,JSON.stringify(data,null,4), 
+		function(error) {
+			if(!error)
+			{
+				// it worked!
+			}
+		});
+	// fs.writeFile(getFileName(id), JSON.stringify(data,null,4));
 }
 
 http.createServer(function (req, res) {
@@ -86,6 +100,7 @@ http.createServer(function (req, res) {
   } 
   else if (action == 'set')
   {
+	
 	fs.readFile(getFileName(apikey), function(err, data) {
 		if (err)
 		{
