@@ -101,7 +101,7 @@ http.createServer(function (req, res) {
 			console.log(err);
 			return;
 		}
-		data = json.parse(data);
+		data = JSON.parse(data);
 		
 		data.dict[name] = a[3];
 		write(apikey,data);
