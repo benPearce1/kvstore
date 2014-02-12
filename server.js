@@ -20,14 +20,13 @@ function createNewData(id)
 
 function write(id, data)
 {
-	blobService.createBlockBlobFromTest(process.env.StorageContainerName, id, JSON.stringify(data,null,4), 
+	blobService.createBlockBlobFromText(process.env.StorageContainerName, id, JSON.stringify(data,null,4), 
 		function(error) {
 			if(!error)
 			{
 				// it worked!
 			}
 		});
-	// fs.writeFile(getFileName(id), JSON.stringify(data,null,4));
 }
 
 http.createServer(function (req, res) {
