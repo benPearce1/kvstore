@@ -108,6 +108,8 @@ http.createServer(function (req, res) {
 			// value was passed on url
 			data.dict[name] = a[3];
 			write(apikey,data);
+			res.writeHead(200, data.dict[name]);
+			res.end();
 		}
 		else if (req.method == 'POST')
 		{
@@ -116,10 +118,12 @@ http.createServer(function (req, res) {
 				data.dict[name] = chunk.toString();
 				write(apikey,data);
 			});
+			
+			req.end('end', function() {
+				res.writeHead(200, data.dict[name]);
+				res.end();
+			});
 		}
-		
-		res.writeHead(200);
-		res.end(data.dict[name]);
 	});
   }
 }).listen(port, '127.0.0.1');
