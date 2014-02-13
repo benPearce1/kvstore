@@ -29,102 +29,116 @@ function write(id, data)
 		});
 }
 
-http.createServer(function (req, res) {
-  res.writeHead(200, {'Content-Type': 'text/plain'});
-  var url_parts = url.parse(req.url, true);
+function getParameters(url)
+{
+	var url_parts = url.parse(url, true);
   
-  var path = url_parts.path;
-  if (path.charAt(0) == '/')
-  {
-	path = path.substr(1,path.length);
-  }
-  var a = path.split('/');
-  
-  // check for any request parameters
-  if (a.length == 0)
-  {
-	res.writeHead(404);
-	res.end('Not found');
-  }
-  
-  if (a[0] == 'init')
-  {
-	var uuid = require('node-uuid');
-	var id = uuid.v4();
+	var path = url_parts.path;
+	if (path.charAt(0) == '/')
+	{
+		path = path.substr(1,path.length);
+	}
+	var a = path.split('/');
 	
-	write(id, createNewData(id));
-	// generate new api key and storage
-	res.writeHead(200);
-	res.end(id);
-  }
-  
-  var apikey = a[0];
-  
-  if (apikey.length != 36)
-  {
-	res.writeHead(400);
-	res.end('api key error');
-  }
-  
-  var action = a[1];
-  var name = a[2];
-  
-  console.log('{' + apikey + '} ' + action + ' ' + name );
-  
-  if (action == 'get')
-  {
-	blobService.getBlobToText(process.env.StorageContainerName, apikey, function(error, data, blockBlob, response) {
-		if (error)
+	return a;
+}
+
+http.createServer(function (req, res) {
+	var action, name, value, apikey;
+
+	res.writeHead(200, {'Content-Type': 'text/plain'});
+	var params = getParameters(req.url);
+	
+	if (params.length == 0)
+	{
+		res.writeHead(404);
+		res.end('Not found');
+	}
+	else
+	{
+		if (params[0] == 'init')
 		{
-			console.log(err);
-			return;
-		}
-		data = JSON.parse(data);
-		
-		if (data.dict[name] != null)
-		{
-			res.writeHead(200);
-			res.end(data.dict[name]);
+			action = params[0];
 		}
 		else
 		{
-			res.writeHead(200);
-			res.end();
+			apikey = params[0];
+			action = params[1];
+			name = params[2];
+			if (params.length = 4)
+			{
+				value = params[3];
+			}
 		}
-	});
-  } 
-  else if (action == 'set')
-  {
-	blobService.getBlobToText(process.env.StorageContainerName, apikey, function(error, data, blockBlob, response) {
-		if (error)
+  
+		if (action == 'init')
 		{
-			console.log(err);
-			return;
-		}
-		data = JSON.parse(data);
-		
-		if (a.length >= 3)
-		{
-			// value was passed on url
-			data.dict[name] = a[3];
-			write(apikey,data);
-			res.writeHead(200, data.dict[name]);
-			res.end();
-		}
-		else if (req.method == 'POST')
-		{
-			// look for data in posted values
-			req.on('data', function(chunk) { 
-				data.dict[name] = chunk.toString();
-				write(apikey,data);
-			});
+			var uuid = require('node-uuid');
+			var id = uuid.v4();
 			
-			req.end('end', function() {
-				res.writeHead(200, data.dict[name]);
-				res.end();
+			write(id, createNewData(id));
+			// generate new api key and storage
+			res.writeHead(200);
+			res.end(id);
+		}
+	  
+		console.log('{' + apikey + '} ' + action + ' ' + name );
+	  
+		if (action == 'get')
+		{
+			blobService.getBlobToText(process.env.StorageContainerName, apikey, function(error, data, blockBlob, response) {
+				if (error)
+				{
+					console.log(err);
+					return;
+				}
+				data = JSON.parse(data);
+				
+				if (data.dict[name] != null)
+				{
+					res.writeHead(200);
+					res.end(data.dict[name]);
+				}
+				else
+				{
+					res.writeHead(200);
+					res.end();
+				}
+			});
+		} 
+		else if (action == 'set')
+		{
+			blobService.getBlobToText(process.env.StorageContainerName, apikey, function(error, data, blockBlob, response) {
+				if (error)
+				{
+					console.log(err);
+					return;
+				}
+				data = JSON.parse(data);
+				
+				if (req.method == 'GET' && a.length >= 3)
+				{
+					// value was passed on url
+					data.dict[name] = a[3];
+					write(apikey,data);
+					res.writeHead(200, data.dict[name]);
+					res.end();
+				}
+				else if (req.method == 'POST')
+				{
+					// look for data in posted values
+					req.on('data', function(chunk) { 
+						data.dict[name] = chunk.toString();
+						write(apikey,data);
+					});
+					
+					req.on('end', function() {
+						res.writeHead(200, data.dict[name]);
+						res.end();
+					});
+				}
 			});
 		}
-	});
-  }
+	}
 }).listen(port, '127.0.0.1');
 console.log('Server running at http://127.0.0.1:' + port + '/');
