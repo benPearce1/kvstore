@@ -1,6 +1,5 @@
 var http = require('http');
 var port = process.env.port || 80
-var url = require('url');
 var fs = require('fs');
 var azure = require('azure');
 var blobService = azure.createBlobService();
@@ -31,6 +30,7 @@ function write(id, data)
 
 function getParameters(u)
 {
+	var url = require('url');
 	var url_parts = url.parse(u, true);
   
 	var path = url_parts.path;
