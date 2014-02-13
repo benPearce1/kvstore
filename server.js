@@ -29,9 +29,9 @@ function write(id, data)
 		});
 }
 
-function getParameters(url)
+function getParameters(u)
 {
-	var url_parts = url.parse(url, true);
+	var url_parts = url.parse(u, true);
   
 	var path = url_parts.path;
 	if (path.charAt(0) == '/')
