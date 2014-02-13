@@ -103,10 +103,23 @@ http.createServer(function (req, res) {
 		}
 		data = JSON.parse(data);
 		
-		data.dict[name] = a[3];
-		write(apikey,data);
+		if (a.length >= 3)
+		{
+			// value was passed on url
+			data.dict[name] = a[3];
+			write(apikey,data);
+		}
+		else if (req.method == 'POST')
+		{
+			// look for data in posted values
+			req.on('data', function(chunk) { 
+				data.dict[name] = chunk.toString();
+				write(apikey,data);
+			});
+		}
+		
 		res.writeHead(200);
-		res.end(a[3]);
+		res.end(data.dict[name]);
 	});
   }
 }).listen(port, '127.0.0.1');
