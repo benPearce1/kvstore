@@ -119,7 +119,7 @@ http.createServer(function (req, res) {
 				if (req.method == 'GET' && a.length >= 3)
 				{
 					// value was passed on url
-					data.dict[name] = a[3];
+					data.dict[name] = value;
 					write(apikey,data);
 					res.writeHead(200, data.dict[name]);
 					res.end();
