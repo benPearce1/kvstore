@@ -116,7 +116,7 @@ http.createServer(function (req, res) {
 				}
 				data = JSON.parse(data);
 				
-				if (req.method == 'GET' && a.length >= 3)
+				if (req.method == 'GET' && value != null)
 				{
 					// value was passed on url
 					data.dict[name] = value;
