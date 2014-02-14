@@ -121,7 +121,7 @@ http.createServer(function (req, res) {
 				}
 				data = JSON.parse(data);
 				
-				if (req.method == 'GET' && a.length >= 3)
+				if (req.method == 'GET' && value != null)
 				{
 					// value was passed on url
 					data.dict[name] = value;
@@ -140,8 +140,8 @@ http.createServer(function (req, res) {
 					});
 					
 					req.on('end', function() {
-						res.writeHead(200, data.dict[name]);
-						res.end();
+						res.writeHead(200);
+						res.end(data.dict[name]);
 					});
 				}
 			});
