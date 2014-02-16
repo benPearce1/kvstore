@@ -2,7 +2,7 @@ var http = require('http');
 var port = process.env.port || 80
 var fs = require('fs');
 var azure = require('azure');
-var lockfile = require('lockfile');
+// var lockfile = require('lockfile');
 var blobService = azure.createBlobService();
 
 
@@ -111,12 +111,12 @@ http.createServer(function (req, res) {
 		} 
 		else if (action == 'set')
 		{
-			lockfile.lock(apikey + '.lock',{}, function(er) { });
+			//lockfile.lock(apikey + '.lock',{}, function(er) { });
 			blobService.getBlobToText(process.env.StorageContainerName, apikey, function(error, data, blockBlob, response) {
 				if (error)
 				{
 					console.log(err);
-					lockfile.unlock(apikey + '.lock',{}, function(er) { });
+					//lockfile.unlock(apikey + '.lock',{}, function(er) { });
 					return;
 				}
 				data = JSON.parse(data);
@@ -126,7 +126,7 @@ http.createServer(function (req, res) {
 					// value was passed on url
 					data.dict[name] = value;
 					write(apikey,data);
-					lockfile.unlock(apikey + '.lock',{}, function(er) { });
+					//lockfile.unlock(apikey + '.lock',{}, function(er) { });
 					res.writeHead(200, data.dict[name]);
 					res.end();
 				}
