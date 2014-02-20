@@ -1,16 +1,7 @@
 var http = require('http');
 var port = process.env.port || 80
-var fs = require('fs');
-var azure = require('azure');
-// var lockfile = require('lockfile');
-var blobService = azure.createBlobService();
-
-
-blobService.createContainerIfNotExists('data', function(error){
-    if(!error){
-        // Container exists and is private
-    }
-});
+var store = require('./azureBlobDataAccess');
+//var store = require('./fileDataAccess');
 
 function createNewData(id)
 {
@@ -22,13 +13,7 @@ function createNewData(id)
 
 function write(id, data)
 {
-	blobService.createBlockBlobFromText(process.env.StorageContainerName, id, JSON.stringify(data,null,4), 
-		function(error) {
-			if(!error)
-			{
-				// it worked!
-			}
-		});
+	store.put(id,data);
 }
 
 function getParameters(u)
@@ -89,14 +74,13 @@ http.createServer(function (req, res) {
 	  
 		if (action == 'get')
 		{
-			blobService.getBlobToText(process.env.StorageContainerName, apikey, function(error, data, blockBlob, response) {
+			store.get(apikey, function(error, data) {
 				if (error)
 				{
-					console.log(err);
+					console.log(error);
 					return;
 				}
-				data = JSON.parse(data);
-				
+			
 				if (data.dict[name] != null)
 				{
 					res.writeHead(200);
@@ -112,15 +96,14 @@ http.createServer(function (req, res) {
 		else if (action == 'set')
 		{
 			//lockfile.lock(apikey + '.lock',{}, function(er) { });
-			blobService.getBlobToText(process.env.StorageContainerName, apikey, function(error, data, blockBlob, response) {
+			store.get(apikey, function(error,data) {
 				if (error)
 				{
-					console.log(err);
+					console.log(error);
 					//lockfile.unlock(apikey + '.lock',{}, function(er) { });
 					return;
 				}
-				data = JSON.parse(data);
-				
+				console.log(data)
 				if (req.method == 'GET' && value != null)
 				{
 					// value was passed on url
